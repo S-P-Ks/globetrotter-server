@@ -1,4 +1,10 @@
-import { Router, Request, Response } from "express"
+import { Router } from "express"
+import { createUser, getCurrentUser, getUserById } from "../controllers/user.controllers"
 
-export const router = Router()
+const router = Router()
 
+router.post("/", createUser)
+router.get("/me", getCurrentUser)
+router.get("/:id", getUserById)
+
+export default router

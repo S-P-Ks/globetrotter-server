@@ -1,33 +1,40 @@
 import express, { Request, Response } from "express";
 import { connect } from "mongoose";
-import dotenv from "dotenv"
-
-dotenv.config()
+import cookieParser from "cookie-parser"
+import cityRoutes from "./routes/city.routes";
+import userRoutes from "./routes/user.routes";
+import shareImageRoutes from "./routes/share-image.route";
+import { MONGO_URL, port } from "./config";
+import cors from "cors"
 
 const app = express();
-const port = process.env.PORT;
-const MONGO_URL = process.env.MONGO_DB_URL
 
+app.use(cors({
+    origin: `${process.env.CLIENT_BASE_URL}`,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Content-Length", "X-Custom-Header"],
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
-app.get("/", (req: Request, res: Response) => {
+app.use("/city", cityRoutes);
+app.use("/user", userRoutes);
+app.use("/share-image", shareImageRoutes);
+
+app.get("/", async (req: Request, res: Response) => {
     res.send("Hello World!");
 });
 
-connect(
-    "mongodb+srv://haris2iftikhar:GClTzr15XhkjvN6k@backenddb.nrurtot.mongodb.net/Node-API?retryWrites=true&w=majority"
-)
+connect(`${MONGO_URL}`)
     .then(() => {
         console.log("Connected to database!");
-        app.listen(3000, () => {
+        app.listen(port, () => {
             console.log("Server is running on port 3000");
         });
     })
     .catch(() => {
         console.log("Connection failed!");
     });
-
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
-});
