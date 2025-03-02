@@ -218,10 +218,10 @@ const seedData = async () => {
     connect(MONGO_URL || "").then(async () => {
         await City.insertMany(cities).then(() => {
             console.log("Successfully Added")
-        }).catch(err => {
+        }).catch((err: any) => {
             console.log(err)
         });
-    }).catch(err => {
+    }).catch((err: any) => {
         console.log(err)
     })
 }

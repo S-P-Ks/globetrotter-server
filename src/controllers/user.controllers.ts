@@ -10,18 +10,16 @@ export const createUser = async (req: Request, res: Response) => {
             return
         }
 
-        const existingUser = await User.findOne({ username });
-        if (existingUser) {
-            res.status(409).json({ error: "Username already taken" });
-            return
+        let existingUser = await User.findOne({ username });
+
+        if (!existingUser) {
+            existingUser = await User.create({
+                username,
+                score: { correct: 0, incorrect: 0 },
+            });
         }
 
-        const newUser = await User.create({
-            username,
-            score: { correct: 0, incorrect: 0 },
-        });
-
-        res.cookie("userId", newUser._id, {
+        res.cookie("userId", existingUser._id, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             maxAge: 60 * 60 * 24 * 30 * 1000,
@@ -31,7 +29,7 @@ export const createUser = async (req: Request, res: Response) => {
 
         res.status(201).json({
             success: true,
-            userId: newUser._id
+            userId: existingUser._id
         });
     } catch (error) {
         console.error("Error creating user:", error);

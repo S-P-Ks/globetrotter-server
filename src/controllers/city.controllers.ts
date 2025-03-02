@@ -20,7 +20,7 @@ export const getRandomCity = async (req: Request, res: Response) => {
         }
 
         const answeredCityIds = user.progress
-            .filter(p => p.correct)
+            .filter(p => p.city)
             .map(p => p.city.toString());
 
         const randomCity = await City.aggregate([
@@ -34,12 +34,15 @@ export const getRandomCity = async (req: Request, res: Response) => {
         ]);
 
         if (!randomCity.length) {
-            res.status(404).json({ message: "No cities found" });
+            res.status(200).json({
+                data: {
+                },
+                options: [],
+            });
             return
         }
 
         const correctCityId = randomCity[0]._id;
-
 
         const wrongOptions = await City.aggregate([
             { $match: { _id: { $ne: correctCityId } } },
